@@ -2,9 +2,11 @@ package com.decipher.olaBackend.services;
 
 import com.decipher.olaBackend.DataSource.Connections;
 import com.decipher.olaBackend.DataSource.Match;
+import com.decipher.olaBackend.enums.HandlerRequest;
 import com.decipher.olaBackend.models.AcceptRequestModel;
 import com.decipher.olaBackend.models.LocationRequestModel;
 import com.decipher.olaBackend.models.PingMessageModel;
+import com.decipher.olaBackend.models.WebSocketRequestModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +47,11 @@ public class DriverService {
 
     public void notifyAcceptRequest(LocationRequestModel location) throws IOException {
        WebSocketSession webSocketSession = (WebSocketSession) connections.riderConnections.get(match.match.get(location.getUserId()));
+        WebSocketRequestModel webSocketRequest = new WebSocketRequestModel();
+        webSocketRequest.setType(HandlerRequest.LOCATIONREQUEST.getName());
+        webSocketRequest.setRequest(location);
        if(!Objects.isNull(webSocketSession)) {
-           webSocketSession.sendMessage(new TextMessage(new ObjectMapper().writeValueAsString(location)));
+           webSocketSession.sendMessage(new TextMessage(new ObjectMapper().writeValueAsString(webSocketRequest)));
        }
     }
 
